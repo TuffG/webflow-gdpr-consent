@@ -1,0 +1,108 @@
+<!-- Cookie Consent HTML + JS (GDPR compliant)
+Embed this as an Embed element at the end of the <body>.
+Styles are in "cookie-style.html" (copy into the <head>).
+-->
+
+<!-- Cookie Consent Modal -->
+<div id="cookie-consent" class="cc-modal cc-hidden ck-preference__bg" role="dialog" aria-labelledby="cc-title" aria-modal="true">
+  <div class="cc-modal__inner ck-preference__scroll-w">
+    <button class="cc-close" aria-label="Close">×</button>
+    <h2 id="cc-title" class="cc-heading">Cookie Settings</h2>
+    <p class="cc-text">
+      We use cookies to improve your experience. You can change your preferences at any time. For more details, please see our
+      <a href="/datenschutz" class="cc-link" target="_blank" rel="noopener">Privacy Policy</a>.
+    </p>
+
+    <form id="cc-form" class="cc-form">
+      <fieldset class="cc-fieldset">
+        <legend class="cc-legend">Categories</legend>
+        <label class="cc-option">
+          <input type="checkbox" name="essential" checked disabled />
+          Essential (always active)
+        </label>
+        <label class="cc-option">
+          <input type="checkbox" name="analytics" />
+          Analytics
+        </label>
+        <label class="cc-option">
+          <input type="checkbox" name="marketing" />
+          Marketing
+        </label>
+      </fieldset>
+      <div class="cc-actions">
+        <button type="button" id="cc-accept-all" class="cc-btn cc-btn--primary">Accept all</button>
+        <button type="submit" class="cc-btn cc-btn--secondary">Save selection</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+(function() {
+  const MODAL = document.getElementById('cookie-consent');
+  const FORM = document.getElementById('cc-form');
+  const ACCEPT_ALL_BTN = document.getElementById('cc-accept-all');
+  const CLOSE_BTN = MODAL.querySelector('.cc-close');
+  const STORAGE_KEY = 'cookie_consent_v1';
+
+  // Debug logs
+  console.log('Cookie consent script started');
+  console.log({MODAL, FORM, ACCEPT_ALL_BTN, CLOSE_BTN});
+
+  const saveConsent = (state) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, ts: Date.now() }));
+  };
+  const getConsent = () => {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY));
+    } catch {
+      return null;
+    }
+  };
+
+  const applyScripts = (state) => {
+    if (state.analytics) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'consent_given' });
+      alert('Analytics enabled');
+      // loadAnalytics();
+    }
+    if (state.marketing) {
+        alert('Marketing enabled');
+      // loadMarketingPixel();
+    }
+  };
+
+  const openModal = () => MODAL.classList.remove('cc-hidden');
+  const closeModal = () => MODAL.classList.add('cc-hidden');
+
+  ACCEPT_ALL_BTN.addEventListener('click', () => {
+    const consentState = { essential: true, analytics: true, marketing: true };
+    saveConsent(consentState);
+    applyScripts(consentState);
+    closeModal();
+  });
+
+  FORM.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(FORM);
+    const consentState = {
+      essential: true,
+      analytics: fd.has('analytics'),
+      marketing: fd.has('marketing')
+    };
+    saveConsent(consentState);
+    applyScripts(consentState);
+    closeModal();
+  });
+
+  CLOSE_BTN.addEventListener('click', closeModal);
+
+  const existingConsent = getConsent();
+  if (existingConsent) {
+    applyScripts(existingConsent);
+  } else {
+    openModal();
+  }
+})();
+</script>

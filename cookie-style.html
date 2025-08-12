@@ -1,0 +1,122 @@
+<!-- Cookie Consent Styles (GDPR compliant)
+in Project Settings → Custom Code → Head Code
+-->
+<style>
+  /* Cookie Consent – basic styling */
+  :root {
+    --cc-bg: #ffffff;
+    --cc-text: #000000;
+    --cc-border: #e5e5e5;
+    --cc-primary: #000000;
+  }
+
+  .cc-modal {
+    position: fixed;
+    z-index: 9999;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    font-family: sans-serif;
+  }
+
+  .cc-modal__inner {
+    background: var(--cc-bg);
+    color: var(--cc-text);
+    max-width: 480px;
+    width: 100%;
+    border-radius: 8px;
+    padding: 1.5rem;
+    position: relative;
+  }
+
+  .cc-close {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  .cc-heading {
+    margin-top: 0;
+  }
+
+  .cc-fieldset {
+    border: 1px solid var(--cc-border);
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .cc-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .cc-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  .cc-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--cc-primary);
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .cc-btn--primary {
+    background: var(--cc-primary);
+    color: #fff;
+  }
+
+  .cc-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .cc-btn--primary:hover {
+    background: #333;
+  }
+
+  .cc-hidden {
+    display: none !important;
+  }
+
+  .cc-modal.cc-hidden {
+    display: none !important;
+  }
+
+  .cc-modal {
+    inset: auto;
+    bottom: 1rem;
+    right: 1rem;
+    background: transparent;
+    display: block;
+    z-index: 9999;
+  }
+
+  .ck-preference__bg {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .ck-preference__scroll-w::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ck-preference__scroll-w {
+    -ms-overflow-style: none;
+  }
+
+  .w--redirected-focus {
+    box-shadow: none !important;
+  }
+</style>
