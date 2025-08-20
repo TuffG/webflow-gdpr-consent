@@ -29,26 +29,28 @@ A lightweight, dependency-free consent manager for Webflow that helps you collec
 ```
 
 ## Wiring Your Tools
-Open `cookie.html` and locate `applyScripts(state)`. Replace the placeholders with your integrations:
+Open `cookie.html` and locate the function that applies consent (`applyScripts(state)`). Insert your integrations there as follows:
 
-```js
-const applyScripts = (state) => {
-  if (state.analytics) {
-    // Example: Google Tag Manager / GA4
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({ event: 'consent_given' });
-    // loadAnalytics(); // TODO: implement your loader
-  }
-  if (state.marketing) {
-    // Example: Meta/LinkedIn/TikTok pixels
-    // loadMarketingPixel(); // TODO: implement your loader
-  }
-};
-```
+- Analytics: After the user opts in, initialize your analytics library (e.g., GA4 or GTM) and trigger any consent-related events in your data layer. Ensure scripts are only loaded after consent and avoid duplicates by guarding with a unique element ID or a runtime flag.
+- Marketing: Only inject marketing pixels or SDKs after marketing consent is granted. Use on-demand script injection and add a duplicate guard (e.g., check for an existing tag by ID) before appending anything to the DOM.
+- Error handling: Wrap vendor initializations in small helper functions and handle failures gracefully so a third-party outage does not break the page.
+- Performance: Prefer async/deferred loading and load as little as possible on first paint; inject heavier tools only when consent is present.
 
 Recommendations:
 - Lazy-load third-party scripts only after opt-in (create `loadAnalytics()` / `loadMarketingPixel()` functions that inject `<script>` tags on demand).
 - For GTM, you can push a custom event and configure GTM to load tags based on consent variables.
+
+## Reset Consent via URL Parameter
+For testing or support, you can clear the saved consent by appending a parameter to the URL:
+
+```
+https://your-domain.com/?reset-consent
+```
+
+Behavior:
+- On page load, the script removes the `localStorage` entry `cookie_consent_v1` when it detects `reset-consent` in the query string.
+- The parameter is then removed from the address bar via `history.replaceState` (no reload), so links don’t continue resetting consent.
+- After resetting, the consent modal will show again on the next interaction/page view according to your initialization logic.
 
 ## UI and Configuration
 - Categories are defined in the form in `cookie.html` with checkboxes named `analytics` and `marketing`. `essential` is always enabled.

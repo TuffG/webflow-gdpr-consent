@@ -39,6 +39,16 @@ Styles are in "cookie-style.html" (copy into the <head>).
 
 <script>
 (function() {
+  // Check for reset parameter in URL
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('reset-consent')) {
+    localStorage.removeItem('cookie_consent_v1');
+    // Optional: Remove the parameter from URL without page reload
+    const cleanUrl = window.location.href.split('?')[0];
+    window.history.replaceState({}, document.title, cleanUrl);
+  }
+
+
   const MODAL = document.getElementById('cookie-consent');
   const FORM = document.getElementById('cc-form');
   const ACCEPT_ALL_BTN = document.getElementById('cc-accept-all');
@@ -47,7 +57,7 @@ Styles are in "cookie-style.html" (copy into the <head>).
 
   // Debug logs
   console.log('Cookie consent script started');
-  console.log({MODAL, FORM, ACCEPT_ALL_BTN, CLOSE_BTN});
+  console.log({MODAL, FORM, ACCEPT_ALL_BTN, CLOSE_BTN, resetRequested: urlParams.has('reset-consent')});
 
   const saveConsent = (state) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, ts: Date.now() }));
@@ -60,16 +70,44 @@ Styles are in "cookie-style.html" (copy into the <head>).
     }
   };
 
+  const loadMarketingScript = () => {
+    const script = document.createElement('script');
+    script.src = 'https://marketing.example.com/inject.bundle.js';
+    script.async = true;
+    script.id = 'marketing-script';
+    document.head.appendChild(script);
+  };
+
+  // Example: GA4 loader (uses global GA_MEASUREMENT_ID if present, else placeholder)
+  const loadAnalytics = (measurementId = window.GA_MEASUREMENT_ID || 'G-XXXXXXX') => {
+    if (document.getElementById('ga-script')) return; // guard
+
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`;
+    s.id = 'ga-script';
+    document.head.appendChild(s);
+
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    window.gtag = window.gtag || gtag;
+    gtag('js', new Date());
+    // Anonymize IP is recommended in many jurisdictions
+    gtag('config', measurementId, { anonymize_ip: true });
+  };
+
   const applyScripts = (state) => {
     if (state.analytics) {
+      // Load GA only after consent
+      loadAnalytics();
       window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({ event: 'consent_given' });
-      alert('Analytics enabled');
-      // loadAnalytics();
+      window.dataLayer.push({ event: 'consent_analytics_granted' });
     }
     if (state.marketing) {
-        alert('Marketing enabled');
-      // loadMarketingPixel();
+      // Only load if not already loaded
+      if (!document.getElementById('marketing-script')) {
+        loadMarketingScript();
+      }
     }
   };
 
